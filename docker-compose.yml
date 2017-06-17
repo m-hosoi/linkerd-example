@@ -1,0 +1,39 @@
+version: "2"
+services:
+  api:
+    image: nginx:1.12.0-alpine
+    ports:
+      - "20001:80"
+    volumes:
+      - ./data/api:/usr/share/nginx/html:ro
+  #jupyter-r:
+    #build:
+      #context: ./
+      #dockerfile: Dockerfile-r
+    #ports:
+      #- "8889:8888"
+    #command: start-notebook.sh --NotebookApp.token='${JUPYTER_PASS} --NotebookApp.iopub_data_rate_limit=50000000'
+    #volumes:
+      #- ${LOCAL_DATA_PATH}:/home/jovyan/work
+    #environment:
+      #DB_HOST: "${DB_HOST}"
+  linkerd:
+    image: buoyantio/linkerd:1.1.0
+    command: /config.yaml
+    ports:
+      - "9990:9990"
+      - "8080:8080"
+    #links:
+      #- namerd:namerd
+      #- api:api
+    volumes:
+      - ./data/linkerd/config.yaml:/config.yaml:ro
+  namerd:
+    image: buoyantio/namerd:1.1.0
+    command: /config.yaml
+    ports:
+      - "4100:4100"
+      - "4180:4180"
+    volumes:
+      - ./data/namerd/config.yaml:/config.yaml:ro
+      - ./data/namerd/disco:/disco
